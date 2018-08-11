@@ -19,7 +19,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private EditorViewModel mEditorViewModel;
     private EditText mEditText;
-    private boolean mNewNote;
+    private boolean mNewNote , mEditing;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,6 +30,9 @@ public class EditorActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_check);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mEditText = this.findViewById(R.id.note_text);
+        if(savedInstanceState != null){
+            mEditing = savedInstanceState.getBoolean(Constants.EDITING_KEY);
+        }
         initViewModel();
     }
 
@@ -38,7 +41,7 @@ public class EditorActivity extends AppCompatActivity {
         mEditorViewModel.mLiveNote.observe(this, new Observer<NoteEntity>() {
             @Override
             public void onChanged(@Nullable NoteEntity noteEntity) {
-                if (noteEntity != null) {
+                if (noteEntity != null && !mEditing) {
                     mEditText.setText(noteEntity.getText());
                 }
             }
@@ -93,4 +96,9 @@ public class EditorActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(Constants.EDITING_KEY , true);
+        super.onSaveInstanceState(outState);
+    }
 }
